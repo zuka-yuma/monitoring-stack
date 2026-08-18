@@ -1,0 +1,34 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.13.2
+    restart: unless-stopped
+    networks: [observenet]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - /mnt/ssd/prometheus:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --storage.tsdb.retention.size=50GB
+
+  grafana:
+    image: grafana/grafana:12.4.6
+    restart: unless-stopped
+    networks: [observenet]
+    ports:
+      - "3000:3000"
+    volumes:
+      - /mnt/ssd/grafana:/var/lib/grafana
+
+  alertmanager:
+    image: prom/alertmanager:v0.33.1
+    restart: unless-stopped
+    networks: [observenet]
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
+      - /etc/alertmanager-secrets:/etc/alertmanager-secrets:ro
+
+networks:
+  observenet: { external: true }

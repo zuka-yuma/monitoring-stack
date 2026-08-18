@@ -1,0 +1,14 @@
+groups:
+  - name: mem_rule
+    rules:
+      - alert: MemoryPressureHigh
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Available memory down to {{ $value | humanizePercentage }} of total"
+          description: >
+            available/total has been below 15% for 10 minutes, likely Minecraft's
+            peak overlapping with other heavy workloads. Check `docker stats` to
+            find the culprit; consider temporarily lowering Minecraft's max heap.

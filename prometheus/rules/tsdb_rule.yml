@@ -1,0 +1,13 @@
+groups:
+  - name: tsdb_rule
+    rules:
+      - alert: HighSeriesCardinality
+        expr: increase(prometheus_tsdb_head_series[1h]) > 5000
+        labels:
+          severity: info
+        annotations:
+          summary: "Active series grew by {{ $value }} in the last hour"
+          description: >
+            Likely a label design mistake (e.g. PID or request ID used as a label
+            value). Check whatever exporter or scrape config was added or changed
+            most recently. Left unchecked, this drives up TSDB size and memory use.

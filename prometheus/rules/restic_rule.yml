@@ -1,0 +1,13 @@
+groups:
+  - name: restic_rule
+    rules:
+      - alert: ResticBackupStale
+        expr: time() - restic_backup_last_success_timestamp_seconds > 90000
+        labels:
+          severity: critical
+        annotations:
+          summary: "Restic backup hasn't succeeded in {{ $value | humanizeDuration }}"
+          description: >
+            No successful backup recorded within the expected daily window (25h).
+            Run `restic snapshots` to check the latest snapshot, and
+            `restic check` to verify repository integrity.

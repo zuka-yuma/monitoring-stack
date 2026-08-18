@@ -1,0 +1,14 @@
+groups:
+  - name: alive_rule
+    rules:
+      - alert: DeadMansSwitch
+        expr: vector(1)
+        labels:
+          severity: none
+        annotations:
+          summary: "Monitoring stack is alive"
+          description: >
+            Always firing; this exists solely to ping an external dead-man's-switch
+            service. No action needed on this alert itself — only act if the
+            external side stops receiving pings, which would suggest the whole
+            host is down.

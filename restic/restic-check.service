@@ -1,0 +1,7 @@
+[Unit]
+Description=Restic repository check (partial data verification)
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/restic/env
+ExecStart=/usr/bin/restic check --read-data-subset=10%%

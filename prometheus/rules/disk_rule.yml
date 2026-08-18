@@ -1,0 +1,14 @@
+groups:
+  - name: swap_rule
+    rules:
+      - alert: DiskSpaceLow
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes < 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.mountpoint }} free space at {{ $value | humanizePercentage }}"
+          description: >
+            On /mnt/storage, suspect Nextcloud or the Nexus blobstore growing.
+            On /mnt/ssd, suspect an unexpected swapfile/TSDB/DB size increase.
+            Run `du -sh /mnt/*/* | sort -rh | head` to find the offender.

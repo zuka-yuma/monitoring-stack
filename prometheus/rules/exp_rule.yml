@@ -1,0 +1,14 @@
+groups:
+  - name: exp_rule
+    rules:
+      - alert: ExporterDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.job }} ({{ $labels.instance }}) is not responding to scrapes"
+          description: >
+            Likely the exporter process stopped or its container is restarting.
+            Check `docker ps` / `systemctl status node_exporter`. This reflects a
+            broken measurement path, not necessarily an outage of the app itself.

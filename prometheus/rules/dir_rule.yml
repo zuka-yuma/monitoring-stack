@@ -1,0 +1,13 @@
+groups:
+  - name: dir_rule
+    rules:
+      - alert: DirectoryUsageHigh
+        expr: dir_size_bytes > on(path) group_left dir_quota_bytes
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.path }} exceeded its expected size"
+          description: >
+            Reached {{ $value | humanize1024 }}B (this is a soft limit — writes are
+            not blocked). If it's Nexus, consider cleaning old proxy cache blobs;
+            if it's Incus, consider removing unused containers/VMs.

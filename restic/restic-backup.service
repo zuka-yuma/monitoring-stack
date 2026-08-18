@@ -1,0 +1,7 @@
+[Unit]
+Description=Restic backup
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/restic/env
+ExecStart=/usr/local/bin/restic-backup.sh

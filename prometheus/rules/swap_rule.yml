@@ -1,0 +1,14 @@
+groups:
+  - name: swap_rule
+    rules:
+      - alert: SwapUsageSpike
+        expr: rate(node_memory_SwapFree_bytes[15m]) < 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Swap usage trending upward"
+          description: >
+            The system has started swapping. No OOM yet, but RAM headroom is gone.
+            Check `free -h`; if this fires alongside MemoryPressureHigh, they likely
+            share the same root cause.

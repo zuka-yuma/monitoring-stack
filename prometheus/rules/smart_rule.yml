@@ -1,0 +1,14 @@
+groups:
+  - name: smart_rule
+    rules:
+      - alert: SmartPreFailureWarning
+        expr: increase(smartctl_device_attribute_raw_value{attribute_name=~"Reallocated_Sector_Ct|Current_Pending_Sector|Reported_Uncorrect"}[7d]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.device }} SMART reallocated/pending sectors rising"
+          description: >
+            {{ $labels.attribute_name }} increased by {{ $value }} over the past 7
+            days. Not an imminent failure, but an early warning sign. Run
+            `smartctl -a {{ $labels.device }}` for details; if the trend continues,
+            start planning a disk replacement.

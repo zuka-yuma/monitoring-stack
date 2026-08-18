@@ -1,0 +1,16 @@
+groups:
+  - name: raid_rule
+    rules:
+      - alert: RaidArrayDegraded
+        expr: node_md_disks{state="failed"} > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "RAID array {{ $labels.device }} is degraded"
+          description: >
+            Active disk count dropped to {{ $value }} (detected independently of the
+            mdmonitor webhook). Needs replacement before a second disk fails.
+            Run `cat /proc/mdstat` and `smartctl -a /dev/sdX` to identify the failed
+            disk. If mdmonitor didn't also alert, check whether mdmonitor itself
+            is still running.
