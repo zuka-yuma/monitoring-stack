@@ -22,6 +22,8 @@ services:
       - "3000:3000"
     volumes:
       - /mnt/ssd/grafana:/var/lib/grafana
+      - ./dashboards/home_lab.yml:/etc/grafana/provisioning/dashboards/home_lab.yml:ro
+      - ./dashboards/homelab:/var/lib/grafana/dashboards/homelab:ro
 
   alertmanager:
     image: prom/alertmanager:v0.33.1
