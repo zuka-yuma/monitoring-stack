@@ -2,7 +2,7 @@ groups:
   - name: tsdb_rule
     rules:
       - alert: HighSeriesCardinality
-        expr: increase(prometheus_tsdb_head_series[1h]) > 5000
+        expr: delta(prometheus_tsdb_head_series[1h]) > 5000
         labels:
           severity: info
         annotations:
