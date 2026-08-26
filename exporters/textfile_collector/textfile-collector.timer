@@ -4,6 +4,7 @@ Description=Daily textfile collect
 [Timer]
 OnCalendar=daily
 Persistent=true
+RandomizedDelaySec=10min
 
 [Install]
 WantedBy=timers.target

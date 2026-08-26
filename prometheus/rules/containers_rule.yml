@@ -1,0 +1,33 @@
+groups:
+  - name: containers
+    rules:
+      # 実際に稼働中のコンテナ(nextcloud, caddy-proxy)に合わせて列挙。cAdvisorは消えると
+      # 系列自体が消えるため absent() で検知する。監視したいコンテナが増えたら追記する
+      - alert: ContainerDisappeared
+        expr: absent(container_last_seen{name="nextcloud"}) or absent(container_last_seen{name="caddy-proxy"})
+        for: 5m
+        labels: {severity: critical}
+        annotations:
+          summary: "コンテナ nextcloud または caddy-proxy が存在しない"
+
+      - alert: ContainerRestartLoop
+        expr: changes(container_start_time_seconds{name!=""}[30m]) > 3
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.name }} が30分で4回以上再起動している"
+
+      - alert: ContainerOomKilled
+        expr: increase(container_oom_events_total{name!=""}[10m]) > 0
+        labels: {severity: critical}
+
+      - alert: ContainerMemoryNearLimit
+        expr: container:memory_limit_utilization:ratio > 0.90
+        for: 10m
+        labels: {severity: warning}
+
+      - alert: ContainerCpuThrottled
+        expr: container:cpu_throttled:ratio > 0.25
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.name }} が CPU limit に絞られている（limit の見直しを）"

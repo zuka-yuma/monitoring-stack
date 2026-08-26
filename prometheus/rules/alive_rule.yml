@@ -1,6 +1,6 @@
 groups:
   - name: alive_rule
-    rules:
+    rules: 
       - alert: DeadMansSwitch
         expr: vector(1)
         labels:

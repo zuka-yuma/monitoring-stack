@@ -4,4 +4,4 @@ Description=Textfile Collector
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/textfile_collector/env
-ExecStart=/usr/local/bin/textfile_collector.sh
+ExecStart=/usr/local/bin/textfile-collector.sh

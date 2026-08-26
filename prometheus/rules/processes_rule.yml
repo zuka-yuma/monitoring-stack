@@ -1,0 +1,35 @@
+groups:
+  - name: processes
+    rules:
+      # process-exporterのconfig.ymlで実際に監視できるグループ名に限定(sshd/rsyslogd)。
+      # nginxは config.yml 上は定義されているが実際には動いていないため対象から除外(常時誤検知するため)。
+      # chronyもこの環境で実際に使っているか未確認のため一旦除外
+      - alert: ProcessDown
+        expr: namedprocess_namegroup_num_procs{groupname=~"sshd|rsyslogd"} == 0
+        for: 3m
+        labels: {severity: critical}
+        annotations:
+          summary: "{{ $labels.instance }} でプロセス {{ $labels.groupname }} が停止"
+
+      - alert: ProcessRestartedRepeatedly
+        expr: changes(namedprocess_namegroup_oldest_start_time_seconds[30m]) > 3
+        labels: {severity: warning}
+
+      - alert: ProcessFdExhaustionRisk
+        expr: namedprocess_namegroup_worst_fd_ratio > 0.85
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.groupname }} の FD が ulimit の85%超（FD リークの疑い）"
+
+      - alert: ZombieProcessesAccumulating
+        expr: namedprocess_namegroup_states{state="Zombie"} > 20
+        for: 30m
+        labels: {severity: warning}
+
+      - alert: SystemdUnitFailed
+        expr: node_systemd_unit_state{state="failed"} == 1
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.instance }} の {{ $labels.name }} が failed"

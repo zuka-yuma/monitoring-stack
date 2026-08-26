@@ -1,14 +1,46 @@
 groups:
-  - name: smart_rule
+  - name: smart
     rules:
-      - alert: SmartPreFailureWarning
-        expr: increase(smartctl_device_attribute_raw_value{attribute_name=~"Reallocated_Sector_Ct|Current_Pending_Sector|Reported_Uncorrect"}[7d]) > 0
-        labels:
-          severity: warning
+      - alert: SmartStatusFailed
+        expr: smartctl_device_smart_status == 0
+        for: 5m
+        labels: {severity: critical}
         annotations:
-          summary: "{{ $labels.device }} SMART reallocated/pending sectors rising"
-          description: >
-            {{ $labels.attribute_name }} increased by {{ $value }} over the past 7
-            days. Not an imminent failure, but an early warning sign. Run
-            `smartctl -a {{ $labels.device }}` for details; if the trend continues,
-            start planning a disk replacement.
+          summary: "{{ $labels.instance }} {{ $labels.device }} の SMART 総合判定が FAILED"
+
+      - alert: SmartReallocatedSectorsIncreasing
+        expr: >
+          increase(
+            smartctl_device_attribute{attribute_name="Reallocated_Sector_Ct",
+                                      attribute_value_type="raw"}[24h]
+          ) > 0
+        labels: {severity: warning}
+        annotations:
+          summary: "代替済みセクタが増加。交換準備を推奨"
+
+      - alert: SmartPendingSectors
+        expr: >
+          smartctl_device_attribute{attribute_name="Current_Pending_Sector",
+                                    attribute_value_type="raw"} > 0
+        for: 30m
+        labels: {severity: warning}
+
+      - alert: SmartCrcErrorsIncreasing
+        expr: >
+          increase(
+            smartctl_device_attribute{attribute_name="UDMA_CRC_Error_Count",
+                                      attribute_value_type="raw"}[24h]
+          ) > 0
+        labels: {severity: warning}
+        annotations:
+          summary: "CRC エラー増加。ディスクではなくケーブル/バックプレーンを疑うこと"
+
+      - alert: SsdWearHigh
+        expr: smartctl_device_percentage_used > 85
+        for: 1h
+        labels: {severity: warning}
+
+      - alert: DiskTemperatureHigh
+        expr: smartctl_device_temperature{temperature_type="current"} > 60
+        for: 15m
+        labels: {severity: warning}

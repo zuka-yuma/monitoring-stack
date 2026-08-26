@@ -1,0 +1,20 @@
+groups:
+  - name: availability
+    rules:
+      - alert: HostRebooted
+        expr: changes(node_boot_time_seconds[10m]) > 0
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.instance }} が再起動した"
+
+      - alert: ClockNotSynchronised
+        expr: node_timex_sync_status == 0
+        for: 15m
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.instance }} の時刻が未同期（ログ相関が壊れる）"
+
+      - alert: ClockSkewDetected
+        expr: abs(node_timex_offset_seconds) > 0.5
+        for: 10m
+        labels: {severity: warning}
