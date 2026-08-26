@@ -6,6 +6,7 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/rules:/etc/prometheus/rules:ro
+      - ./prometheus/target:/etc/prometheus/targets:ro
       - /mnt/ssd/prometheus:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -29,6 +30,8 @@ services:
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/prometheus/alertmanager.yml:ro
       - /etc/alertmanager-secrets:/etc/alertmanager-secrets:ro
+    command:
+      - --config.file=/etc/prometheus/alertmanager.yml
 
 networks:
   observenet: { external: true }
