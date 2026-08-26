@@ -1,0 +1,36 @@
+process_names:
+  # --- Web / Proxy ---
+  - name: "nginx"
+    cmdline: ['^(/usr/sbin/)?nginx']
+  - name: "apache2"
+    cmdline: ['^/usr/sbin/apache2']
+
+  # --- ディレクトリ / 名前解決 / メール ---
+  - name: "{{.Matches.svc}}"
+    cmdline: ['^/usr/(sbin|lib/[^/]+)/(?P<svc>slapd|named|postfix|dovecot|chronyd?)']
+
+  # --- データベース ---
+  - name: "mariadb"
+    cmdline: ['^/usr/sbin/(mariadbd|mysqld)']
+  - name: "postgres"
+    cmdline: ['^/usr/lib/postgresql/.*/bin/postgres']
+
+  # --- 監視基盤自身 ---
+  - name: "{{.Matches.mon}}"
+    cmdline: ['(?P<mon>prometheus|alertmanager|grafana-server|victoria-logs|blackbox_exporter)']
+
+  # --- コンテナランタイム ---
+  - name: "{{.Matches.rt}}"
+    cmdline: ['(?P<rt>dockerd|containerd|conmon|podman)']
+
+  # --- 基盤 ---
+  - name: "sshd"
+    cmdline: ['^/usr/sbin/sshd']
+  - name: "rsyslogd"
+    cmdline: ['^/usr/sbin/rsyslogd']
+  - name: "systemd-journald"
+    cmdline: ['^/lib/systemd/systemd-journald']
+
+  # --- その他をまとめて1系列に（取りこぼし防止） ---
+  - name: "other"
+    cmdline: ['.+']

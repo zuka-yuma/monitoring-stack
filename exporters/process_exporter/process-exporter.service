@@ -1,0 +1,37 @@
+[Unit]
+Description=Prometheus process-exporter
+Documentation=https://github.com/ncabatoff/process-exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# /proc の他ユーザプロセスを読むため root が必要
+User=root
+Group=root
+ExecStart=/usr/local/bin/process-exporter \
+  -config.path /etc/process-exporter/config.yml \
+  -children=true \
+  -threads=true \
+  -recheck
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+
+# サンドボックス
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target
