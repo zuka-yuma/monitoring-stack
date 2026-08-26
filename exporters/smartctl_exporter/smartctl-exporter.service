@@ -7,7 +7,7 @@ After=network-online.target
 User=smartctl_exporter
 Group=smartctl_exporter
 Type=simple
-ExecStart=/usr/local/bin/smartctl_exporter
+ExecStart=/usr/local/bin/smartctl-exporter
 
 [Install]
 WantedBy=multi-user.target

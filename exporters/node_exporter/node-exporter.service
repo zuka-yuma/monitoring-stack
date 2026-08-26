@@ -1,0 +1,13 @@
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node-exporter --collector.textfile.directory=/var/lib/node-exporter/textfile-collector --collector.systemd --collector.systemd.enable-start-time-metrics --collector.systemd.enable-restarts-metrics --collector.processes
+
+[Install]
+WantedBy=multi-user.target
