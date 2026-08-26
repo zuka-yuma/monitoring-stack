@@ -1,0 +1,13 @@
+groups:
+  - name: probe
+    rules:
+      - alert: ProbeFailed
+        expr: probe_success == 0
+        for: 3m
+        labels: {severity: critical}
+
+      - alert: TlsCertExpiringSoon
+        expr: (probe_ssl_earliest_cert_expiry - time()) / 86400 < 21
+        labels: {severity: warning}
+        annotations:
+          summary: "{{ $labels.instance }} の証明書があと {{ $value | printf \"%.0f\" }} 日で失効"

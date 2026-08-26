@@ -1,0 +1,23 @@
+groups:
+  - name: resources
+    rules:
+      - alert: HighCpuUtilization
+        expr: instance:node_cpu_utilization:ratio > 0.90
+        for: 15m
+        labels: {severity: warning}
+
+      - alert: OomKillDetected
+        expr: increase(node_vmstat_oom_kill[10m]) > 0
+        labels: {severity: critical}
+        annotations:
+          summary: "{{ $labels.instance }} で OOM Killer が発動"
+
+      - alert: SwapThrashing
+        expr: rate(node_vmstat_pswpin[5m]) > 100 and rate(node_vmstat_pswpout[5m]) > 100
+        for: 10m
+        labels: {severity: warning}
+
+      - alert: HighIoWait
+        expr: avg by(instance)(rate(node_cpu_seconds_total{mode="iowait"}[5m])) > 0.25
+        for: 15m
+        labels: {severity: warning}

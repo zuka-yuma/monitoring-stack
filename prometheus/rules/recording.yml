@@ -1,0 +1,40 @@
+groups:
+  - name: node.recording
+    interval: 30s
+    rules:
+      - record: instance:node_cpu_utilization:ratio
+        expr: 1 - avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+
+      - record: instance:node_memory_utilization:ratio
+        expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+
+      - record: instance:node_load1_per_core:ratio
+        expr: >
+          node_load1
+          / count by(instance) (count by(instance, cpu) (node_cpu_seconds_total))
+
+      - record: instance:node_filesystem_utilization:ratio
+        expr: >
+          1 - node_filesystem_avail_bytes{fstype!~"tmpfs|squashfs|overlay|ramfs"}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|squashfs|overlay|ramfs"}
+
+      - record: instance:node_tcp_retrans:ratio
+        expr: >
+          rate(node_netstat_Tcp_RetransSegs[5m])
+          / clamp_min(rate(node_netstat_Tcp_OutSegs[5m]), 1)
+
+  - name: container.recording
+    interval: 30s
+    rules:
+      - record: container:cpu_usage:rate5m
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m])
+
+      - record: container:memory_limit_utilization:ratio
+        expr: >
+          container_memory_working_set_bytes{name!=""}
+          / (container_spec_memory_limit_bytes{name!=""} > 0)
+
+      - record: container:cpu_throttled:ratio
+        expr: >
+          rate(container_cpu_cfs_throttled_periods_total{name!=""}[5m])
+          / clamp_min(rate(container_cpu_cfs_periods_total{name!=""}[5m]), 1)
